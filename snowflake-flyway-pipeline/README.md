@@ -48,3 +48,14 @@ Contributions are welcome! Please submit a pull request or open an issue for any
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
+
+# How it works:
+
+When you manually trigger the workflow, you choose the environment.
+For preprod and prod, you can set up environment protection rules in your repo settings for manual approval.
+
+# To set up approvals:
+
+Go to your repo → Settings → Environments → Add preprod and prod environments.
+Add required reviewers for those environments.
+Now, the workflow will run immediately for dev, but require approval for preprod and prod.
