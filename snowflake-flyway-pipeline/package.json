@@ -1,0 +1,25 @@
+{
+  "name": "snowflake-flyway-pipeline",
+  "version": "1.0.0",
+  "description": "A pipeline for executing Flyway migrations on a Snowflake database.",
+  "main": "index.js",
+  "scripts": {
+    "migrate": "flyway migrate"
+  },
+  "dependencies": {
+    "flyway": "^8.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/snowflake-flyway-pipeline.git"
+  },
+  "keywords": [
+    "snowflake",
+    "flyway",
+    "migration",
+    "database"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

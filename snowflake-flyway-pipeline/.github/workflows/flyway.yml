@@ -1,0 +1,65 @@
+name: Flyway Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Choose environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - preprod
+          - prod
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Flyway
+        run: |
+          curl -L -o flyway.zip https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.0.0/flyway-commandline-8.0.0-linux-x64.zip
+          unzip flyway.zip -d flyway
+
+      - name: Write Flyway config
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "dev" ]; then
+            echo "flyway.url=jdbc:snowflake://${{ secrets.DEV_SNOWFLAKE_ACCOUNT }}.${{ secrets.DEV_SNOWFLAKE_REGION }}.snowflakecomputing.com" > flyway.conf
+            echo "flyway.user=${{ secrets.DEV_SNOWFLAKE_USER }}" >> flyway.conf
+            echo "flyway.role=${{ secrets.DEV_SNOWFLAKE_ROLE }}" >> flyway.conf
+            echo "flyway.database=${{ secrets.DEV_SNOWFLAKE_DATABASE }}" >> flyway.conf
+            echo "flyway.warehouse=${{ secrets.DEV_SNOWFLAKE_WAREHOUSE }}" >> flyway.conf
+            echo "flyway.privateKeyFile=${{ secrets.DEV_SNOWFLAKE_PRIVATE_KEY_FILE }}" >> flyway.conf
+            echo "flyway.privateKeyFilePwd=${{ secrets.DEV_SNOWFLAKE_PRIVATE_KEY_PWD }}" >> flyway.conf
+            echo "flyway.schemas=${{ secrets.DEV_SNOWFLAKE_SCHEMA }}" >> flyway.conf
+          elif [ "${{ github.event.inputs.environment }}" = "preprod" ]; then
+            echo "flyway.url=jdbc:snowflake://${{ secrets.PREPROD_SNOWFLAKE_ACCOUNT }}.${{ secrets.PREPROD_SNOWFLAKE_REGION }}.snowflakecomputing.com" > flyway.conf
+            echo "flyway.user=${{ secrets.PREPROD_SNOWFLAKE_USER }}" >> flyway.conf
+            echo "flyway.role=${{ secrets.PREPROD_SNOWFLAKE_ROLE }}" >> flyway.conf
+            echo "flyway.database=${{ secrets.PREPROD_SNOWFLAKE_DATABASE }}" >> flyway.conf
+            echo "flyway.warehouse=${{ secrets.PREPROD_SNOWFLAKE_WAREHOUSE }}" >> flyway.conf
+            echo "flyway.privateKeyFile=${{ secrets.PREPROD_SNOWFLAKE_PRIVATE_KEY_FILE }}" >> flyway.conf
+            echo "flyway.privateKeyFilePwd=${{ secrets.PREPROD_SNOWFLAKE_PRIVATE_KEY_PWD }}" >> flyway.conf
+            echo "flyway.schemas=${{ secrets.PREPROD_SNOWFLAKE_SCHEMA }}" >> flyway.conf
+          else
+            echo "flyway.url=jdbc:snowflake://${{ secrets.PROD_SNOWFLAKE_ACCOUNT }}.${{ secrets.PROD_SNOWFLAKE_REGION }}.snowflakecomputing.com" > flyway.conf
+            echo "flyway.user=${{ secrets.PROD_SNOWFLAKE_USER }}" >> flyway.conf
+            echo "flyway.role=${{ secrets.PROD_SNOWFLAKE_ROLE }}" >> flyway.conf
+            echo "flyway.database=${{ secrets.PROD_SNOWFLAKE_DATABASE }}" >> flyway.conf
+            echo "flyway.warehouse=${{ secrets.PROD_SNOWFLAKE_WAREHOUSE }}" >> flyway.conf
+            echo "flyway.privateKeyFile=${{ secrets.PROD_SNOWFLAKE_PRIVATE_KEY_FILE }}" >> flyway.conf
+            echo "flyway.privateKeyFilePwd=${{ secrets.PROD_SNOWFLAKE_PRIVATE_KEY_PWD }}" >> flyway.conf
+            echo "flyway.schemas=${{ secrets.PROD_SNOWFLAKE_SCHEMA }}" >> flyway.conf
+          fi
+          echo "flyway.locations=filesystem:./scripts" >> flyway.conf
+          echo "flyway.placeholderReplacement=true" >> flyway.conf
+
+      - name: Run Flyway Migrations
+        run: |
+          flyway/flyway-8.0.0/flyway migrate -configFiles=flyway.conf -locations=filesystem:scripts
