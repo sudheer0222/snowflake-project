@@ -22,9 +22,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install npm dependencies
+        run: npm install
+
       - name: Set up Flyway
         run: |
-          curl -L -o flyway.zip https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/8.0.0/flyway-commandline-8.0.0-linux-x64.zip
+          curl -L -o flyway.zip https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/11.11.2/flyway-commandline-11.11.2-linux-x64.zip
           unzip flyway.zip -d flyway
 
       - name: Write Flyway config
