@@ -7,7 +7,7 @@
     "migrate": "flyway migrate"
   },
   "dependencies": {
-    "flyway": "^8.0.0"
+    "flyway": "^11.11.2"
   },
   "devDependencies": {},
   "repository": {
