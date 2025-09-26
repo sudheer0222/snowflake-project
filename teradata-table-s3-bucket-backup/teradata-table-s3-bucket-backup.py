@@ -21,7 +21,16 @@ job.init(args['JOB_NAME'], args)
 
 connection_name = args['TERADATA_CONNECTION_NAME']
 table_name = args['TERADATA_TABLE']
-s3_path = args['S3_TARGET_PATH']
+s3_base_path = args['S3_TARGET_PATH']
+
+# Extract database and table name (assuming format: database.table)
+if '.' in table_name:
+    database_name, table_only_name = table_name.split('.', 1)
+else:
+    database_name = 'default_db'
+    table_only_name = table_name
+
+s3_path = f"{s3_base_path}/{database_name}/{table_only_name}/backup/"
 
 try:
     logger.info(f"Reading from Teradata table: {table_name} using connection: {connection_name}")
